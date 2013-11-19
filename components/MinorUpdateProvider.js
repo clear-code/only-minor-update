@@ -15,6 +15,7 @@ const Cr = Components.results;
 Cu.import('resource://gre/modules/XPCOMUtils.jsm');
 Cu.import('resource://gre/modules/Services.jsm');
 Cu.import('resource://gre/modules/ctypes.jsm');
+Cu.import('resource://gre/modules/Timer.jsm');
 
 const kCID  = Components.ID('{714fb150-50f3-11e3-8f96-0800200c9a66}'); 
 const kID   = '@clear-code.com/only-minor-update/provider;1';
@@ -314,15 +315,30 @@ MinorUpdateProvider.prototype = {
       return;
 
     this.updateCachedUpdateInfo((function() {
-      var US = Cc['@mozilla.org/updates/update-service;1']
-                 .getService(Ci.nsIUpdateService);
-      US.backgroundChecker.checkForUpdates(US, true);
+      try {
+        var currentMajorVersion = Services.appinfo.version.split('.')[0];
+        var updateVersion = this.getUpdateVersion();
+// Cu.reportError(new Error('Trying update: ' + Services.appinfo.version + ' => ' + updateVersion));
+        var updateMajorVersion = updateVersion.split(',')[0];
+        if (currentMajorVersion == updateMajorVersion) {
+          let US = Cc['@mozilla.org/updates/update-service;1']
+                    .getService(Ci.nsIUpdateService);
+          US.backgroundChecker.checkForUpdates(US, true);
+        }
+      }
+      catch(error) {
+        Cu.reportError(error);
+      }
+      finally {
+        this.updateInfoFile.remove(true);
+      }
     }).bind(this));
   },
 
   updateCachedUpdateInfo: function(aCallback) {
     var source = this.defaultUpdateURI;
     var destination = this.updateInfoFile;
+    var self = this;
     var persist = Cc['@mozilla.org/embedding/browser/nsWebBrowserPersist;1']
                    .createInstance(Ci.nsIWebBrowserPersist);
     persist.persistFlags = Ci.nsIWebBrowserPersist.PERSIST_FLAGS_REPLACE_EXISTING_FILES |
@@ -332,13 +348,44 @@ MinorUpdateProvider.prototype = {
                                  aCurSelfProgress, aMaxSelfProgress,
                                  aCurTotalProgress, aMaxTotalProgress) {
         var percentage = Math.round((aCurTotalProgress / aMaxTotalProgress) * 100);
-        if (percentage >= 100)
+        if (percentage < 100)
+          return;
+
+        var delay = 100;
+        setTimeout(function delayedCallback() {
+          if (!self.updateInfoFile.exists()) {
+            return setTimeout(delayedCallback, delay);
+          }
           aCallback();
+        }, delay);
       },
       onStateChange: function(aWebProgress, aRequest, aStateFlags, aStatus) {
       }
     };
     persist.saveURI(source, null, null, null, null, destination, null);
+  },
+
+  getUpdateVersion: function() {
+    var stream = Cc['@mozilla.org/network/file-input-stream;1']
+                  .createInstance(Ci.nsIFileInputStream);
+    stream.init(this.updateInfoFile, 1, 0, false);
+    var updateInfoXMLString = readStringFromInputStream(stream);
+    stream.close();
+
+    var DOMParser = Cc['@mozilla.org/xmlextras/domparser;1']
+                     .createInstance(Ci.nsIDOMParser);
+    var updateInfoXML = DOMParser.parseFromString(updateInfoXMLString, 'text/xml');
+
+    var updates = updateInfoXML.documentElement.childNodes;
+    for (let i = 0, maxi = updates.length; i < maxi; i++) {
+      let update = updates[i];
+      if (update.nodeType != Ci.nsIDOMNode.ELEMENT_NODE)
+        continue;
+      let version = update.getAttribute('appVersion');
+      if (version)
+        return version;
+    }
+    return '';
   },
 
   classID: kCID,
