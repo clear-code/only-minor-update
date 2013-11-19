@@ -218,7 +218,6 @@ MinorUpdateProvider.prototype = {
   observe: function(aSubject, aTopic, aData) {
     switch (aTopic) {
       case 'profile-after-change':
-        Services.obs.removeObserver(this, 'profile-after-change');
         return this.init();
       case 'update-check-start':
         return this.onUpdate();
