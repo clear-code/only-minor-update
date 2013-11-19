@@ -32,7 +32,7 @@ XPCOMUtils.defineLazyGetter(this, 'gABI', function() {
   catch(error) {
     Cu.reportError(error);
   }
-  if (/mac/i.test(navigator.platform)) {
+  if (/mac/i.test(Services.appinfo.OS)) {
     let macutils = Cc['@mozilla.org/xpcom/mac-utils;1'].
                    getService(Ci.nsIMacUtils);
     if (macutils.isUniversalBinary)
@@ -59,7 +59,7 @@ XPCOMUtils.defineLazyGetter(this, 'gOSVersion', function() {
   }
 
   if (osVersion) {
-    if (/win/i.test(navigator.platform)) {
+    if (/win/i.test(Services.appinfo.OS)) {
       const BYTE = ctypes.uint8_t;
       const WORD = ctypes.uint16_t;
       const DWORD = ctypes.uint32_t;
