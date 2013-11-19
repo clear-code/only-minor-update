@@ -11,6 +11,7 @@ const ID = 'only-minor-update@clear-code.com';
 const Cc = Components.classes;
 const Ci = Components.interfaces;
 const Cu = Components.utils;
+const Cr = Components.results;
 Cu.import('resource://gre/modules/XPCOMUtils.jsm');
 Cu.import('resource://gre/modules/Services.jsm');
 Cu.import('resource://gre/modules/ctypes.jsm');
@@ -181,12 +182,24 @@ XPCOMUtils.defineLazyGetter(this, 'gOSVersion', function() {
   return osVersion;
 });
 
+function readStringFromInputStream(inputStream) {
+  var sis = Cc['@mozilla.org/scriptableinputstream;1'].
+            createInstance(Ci.nsIScriptableInputStream);
+  sis.init(inputStream);
+  var text = sis.read(sis.available());
+  sis.close();
+  if (text[text.length - 1] == '\n')
+    text = text.slice(0, -1);
+  return text;
+}
+
+var gLocale = null;
 function getLocale() {
   if (gLocale)
     return gLocale;
 
   for each (res in ['app', 'gre']) {
-    var channel = Services.io.newChannel('resource://' + res + '/' + FILE_UPDATE_LOCALE, null, null);
+    var channel = Services.io.newChannel('resource://' + res + '/update.locale', null, null);
     try {
       var inputStream = channel.open();
       gLocale = readStringFromInputStream(inputStream);
@@ -196,7 +209,7 @@ function getLocale() {
   }
 
   if (!gLocale)
-    throw Components.Exception(FILE_UPDATE_LOCALE + ' file doesn\'t exist in ' +
+    throw Components.Exception('update.locale file doesn\'t exist in ' +
                                'either the application or GRE directories',
                                Cr.NS_ERROR_FILE_NOT_FOUND);
   return gLocale;
