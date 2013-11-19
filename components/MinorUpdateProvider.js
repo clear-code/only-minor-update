@@ -314,9 +314,9 @@ MinorUpdateProvider.prototype = {
       return;
 
     this.updateCachedUpdateInfo((function() {
-      Cc['@mozilla.org/updates/update-checker;1']
-        .createInstance(Ci.nsIUpdateChecker)
-        .checkForUpdates(null, true);
+      var US = Cc['@mozilla.org/updates/update-service;1']
+                 .getService(Ci.nsIUpdateService);
+      US.backgroundChecker.checkForUpdates(US, true);
     }).bind(this));
   },
 
