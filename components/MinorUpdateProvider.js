@@ -227,7 +227,7 @@ MinorUpdateProvider.prototype = {
   get updateInfoFile() {
     if (!this._updateInfoFile) {
       this._updateInfoFile = Services.dirsvc.get('ProfD', Ci.nsIFile);
-      this._updateInfoFile.apend('update.xml');
+      this._updateInfoFile.append('update.xml');
     }
     return this._updateInfoFile;
   },
