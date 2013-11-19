@@ -338,7 +338,7 @@ MinorUpdateProvider.prototype = {
       onStateChange: function(aWebProgress, aRequest, aStateFlags, aStatus) {
       }
     };
-    persist.saveURI(source, null, null, null, null, destination);
+    persist.saveURI(source, null, null, null, null, destination, null);
   },
 
   classID: kCID,
