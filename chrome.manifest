@@ -4,3 +4,4 @@
 
 component {714fb150-50f3-11e3-8f96-0800200c9a66} components/MinorUpdateProvider.js
 contract @clear-code.com/only-minor-update/provider;1 {714fb150-50f3-11e3-8f96-0800200c9a66}
+category profile-after-change  MinorUpdateProviderService @clear-code.com/only-minor-update/provider;1

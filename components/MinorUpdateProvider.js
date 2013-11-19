@@ -21,11 +21,6 @@ const kNAME = 'MinorUpdateProviderService';
 
 const CACHE_LIFETIME = 30 * 60 * 1000; // 30min in milliseconds
 
-// const Application = Cc['@mozilla.org/steel/application;1']
-//     .getService(Ci.steelIApplication);
-
-// let { console } = Application;
-
 XPCOMUtils.defineLazyModuleGetter(this, 'UpdateChannel',
                                   'resource://gre/modules/UpdateChannel.jsm');
 
@@ -178,7 +173,7 @@ XPCOMUtils.defineLazyGetter(this, 'gOSVersion', function() {
     try {
       osVersion += ' (' + sysInfo.getProperty('secondaryLibrary') + ')';
     }
-    catch (e) {
+    catch(e) {
       // Not all platforms have a secondary widget library, so an error is nothing to worry about.
     }
     osVersion = encodeURIComponent(osVersion);
@@ -343,4 +338,4 @@ MinorUpdateProvider.prototype = {
   ]
 };
 
-var NSGetModule = XPCOMUtils.generateNSGetModule([MinorUpdateProvider]);
+var NSGetFactory = XPCOMUtils.generateNSGetFactory([MinorUpdateProvider]);
