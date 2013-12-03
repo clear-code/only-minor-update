@@ -343,11 +343,8 @@ MinorUpdateProvider.prototype = {
         log('Trying update: ' + Services.appinfo.version + ' => ' + updateVersion);
         var updateMajorVersion = updateVersion.split('.')[0];
         log('major version: ' + currentMajorVersion + ' => ' + updateMajorVersion);
-        if (currentMajorVersion == updateMajorVersion) {
-          let US = Cc['@mozilla.org/updates/update-service;1']
-                    .getService(Ci.nsIApplicationUpdateService);
-          US.backgroundChecker.checkForUpdates(US, true);
-        }
+        if (currentMajorVersion == updateMajorVersion)
+          this.retryUpdate();
       }
       catch(error) {
         Cu.reportError(error);
@@ -412,6 +409,12 @@ MinorUpdateProvider.prototype = {
         return version;
     }
     return '';
+  },
+
+  retryUpdate: function() {
+    var US = Cc['@mozilla.org/updates/update-service;1']
+              .getService(Ci.nsIApplicationUpdateService);
+    US.backgroundChecker.checkForUpdates(US, true);
   },
 
   classID: kCID,
