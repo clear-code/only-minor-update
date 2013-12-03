@@ -431,7 +431,7 @@ MinorUpdateProvider.prototype = {
           features = 'chrome,centerscreen,dependent,dialog=no';
           break;
       }
-      Services.ww.openDialog(opener, 'chrome://browser/content/aboutDialog.xul', '', features);
+      Services.ww.openWindow(opener, 'chrome://browser/content/aboutDialog.xul', '', features, null);
     }
     else {
       let US = Cc['@mozilla.org/updates/update-service;1']
