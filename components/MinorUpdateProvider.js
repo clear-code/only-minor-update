@@ -23,6 +23,27 @@ const kNAME = 'MinorUpdateProviderService';
 
 const CACHE_LIFETIME = 30 * 60 * 1000; // 30min in milliseconds
 
+switch (Services.appinfo.name) {
+  case 'Firefox':
+    XPCOMUtils.defineLazyServiceGetter(this, 'Application',
+      '@mozilla.org/fuel/application;1', 'fuelIApplication');
+    break;
+  case 'Thunderbird':
+    XPCOMUtils.defineLazyServiceGetter(this, 'Application',
+      '@mozilla.org/steel/application;1', 'steelIApplication');
+    break;
+}
+
+function log(aMessage) {
+  if (this.Application)
+    Application.console.log(aMessage);
+  else
+    Cu.reportError(new Error(aMessage));
+}
+
+XPCOMUtils.defineLazyModuleGetter(this, 'UpdateChannel',
+                                  'resource://gre/modules/UpdateChannel.jsm');
+
 XPCOMUtils.defineLazyModuleGetter(this, 'UpdateChannel',
                                   'resource://gre/modules/UpdateChannel.jsm');
 
@@ -311,6 +332,7 @@ MinorUpdateProvider.prototype = {
   },
 
   onUpdate: function() {
+    log('onUpdate: shouldDownload = ' + this.shouldDownload);
     if (!this.shouldDownload)
       return;
 
@@ -318,8 +340,9 @@ MinorUpdateProvider.prototype = {
       try {
         var currentMajorVersion = Services.appinfo.version.split('.')[0];
         var updateVersion = this.getUpdateVersion();
-// Cu.reportError(new Error('Trying update: ' + Services.appinfo.version + ' => ' + updateVersion));
+        log('Trying update: ' + Services.appinfo.version + ' => ' + updateVersion);
         var updateMajorVersion = updateVersion.split('.')[0];
+        log('major version: ' + currentMajorVersion + ' => ' + updateMajorVersion);
         if (currentMajorVersion == updateMajorVersion) {
           let US = Cc['@mozilla.org/updates/update-service;1']
                     .getService(Ci.nsIUpdateService);
@@ -338,6 +361,7 @@ MinorUpdateProvider.prototype = {
   updateCachedUpdateInfo: function(aCallback) {
     var source = this.defaultUpdateURI;
     var destination = this.updateInfoFile;
+    log('updateCachedUpdateInfo: ' + source.spec + ' => ' + destination.path);
     var self = this;
     var persist = Cc['@mozilla.org/embedding/browser/nsWebBrowserPersist;1']
                    .createInstance(Ci.nsIWebBrowserPersist);
