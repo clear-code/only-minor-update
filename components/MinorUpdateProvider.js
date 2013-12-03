@@ -44,9 +44,6 @@ function log(aMessage) {
 XPCOMUtils.defineLazyModuleGetter(this, 'UpdateChannel',
                                   'resource://gre/modules/UpdateChannel.jsm');
 
-XPCOMUtils.defineLazyModuleGetter(this, 'UpdateChannel',
-                                  'resource://gre/modules/UpdateChannel.jsm');
-
 XPCOMUtils.defineLazyGetter(this, 'gABI', function() {
   let abi = null;
   try {
