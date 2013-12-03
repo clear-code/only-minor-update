@@ -412,9 +412,32 @@ MinorUpdateProvider.prototype = {
   },
 
   retryUpdate: function() {
-    var US = Cc['@mozilla.org/updates/update-service;1']
-              .getService(Ci.nsIApplicationUpdateService);
-    US.backgroundChecker.checkForUpdates(US, true);
+    var aboutDialog = Services.wm.getMostRecentWindow('Browser:About') ||
+                      Services.wm.getMostRecentWindow('Mail:About');
+    if (aboutDialog) {
+      let opener = aboutDialog.opener;
+      let url = aboutDialog.location.href;
+      aboutDialog.close();
+
+      let features;
+      switch (Services.appinfo.OS) {
+        case 'WINNT':
+          features = 'chrome,centerscreen,dependent';
+          break;
+        case 'Darwin':
+          features = 'chrome,resizable=no,minimizable=no';
+          break;
+        default: // Linux
+          features = 'chrome,centerscreen,dependent,dialog=no';
+          break;
+      }
+      Services.ww.openDialog(opener, 'chrome://browser/content/aboutDialog.xul', '', features);
+    }
+    else {
+      let US = Cc['@mozilla.org/updates/update-service;1']
+                .getService(Ci.nsIApplicationUpdateService);
+      US.backgroundChecker.checkForUpdates(US, true);
+    }
   },
 
   classID: kCID,
