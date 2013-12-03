@@ -345,7 +345,7 @@ MinorUpdateProvider.prototype = {
         log('major version: ' + currentMajorVersion + ' => ' + updateMajorVersion);
         if (currentMajorVersion == updateMajorVersion) {
           let US = Cc['@mozilla.org/updates/update-service;1']
-                    .getService(Ci.nsIUpdateService);
+                    .getService(Ci.nsIApplicationUpdateService);
           US.backgroundChecker.checkForUpdates(US, true);
         }
       }
