@@ -353,7 +353,9 @@ MinorUpdateProvider.prototype = {
         Cu.reportError(error);
       }
       finally {
-        this.updateInfoFile.remove(true);
+        setTimeout((function() {
+          this.updateInfoFile.remove(true);
+        }).bind(this), 5000);
       }
     }).bind(this));
   },
