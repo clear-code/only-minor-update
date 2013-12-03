@@ -319,7 +319,7 @@ MinorUpdateProvider.prototype = {
         var currentMajorVersion = Services.appinfo.version.split('.')[0];
         var updateVersion = this.getUpdateVersion();
 // Cu.reportError(new Error('Trying update: ' + Services.appinfo.version + ' => ' + updateVersion));
-        var updateMajorVersion = updateVersion.split(',')[0];
+        var updateMajorVersion = updateVersion.split('.')[0];
         if (currentMajorVersion == updateMajorVersion) {
           let US = Cc['@mozilla.org/updates/update-service;1']
                     .getService(Ci.nsIUpdateService);
