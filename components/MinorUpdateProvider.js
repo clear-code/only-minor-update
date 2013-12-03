@@ -310,6 +310,9 @@ MinorUpdateProvider.prototype = {
   init: function() {
     Services.obs.addObserver(this, 'update-check-start', false);
     this.overrideUpdateURL();
+
+    if (this.updateInfoFile.exists())
+      this.updateInfoFile.remove(true);
   },
 
   overrideUpdateURL: function() {
