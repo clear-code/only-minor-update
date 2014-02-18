@@ -412,8 +412,9 @@ MinorUpdateProvider.prototype = {
   },
 
   retryUpdate: function() {
-    var aboutDialog = Services.wm.getMostRecentWindow('Browser:About') ||
-                      Services.wm.getMostRecentWindow('Mail:About');
+    var browserAboutDialog = Services.wm.getMostRecentWindow('Browser:About');
+    var mailAboutDialog = Services.wm.getMostRecentWindow('Mail:About');
+    var aboutDialog = browserAboutDialog || mailAboutDialog;
     if (aboutDialog) {
       let opener = aboutDialog.opener;
       let url = aboutDialog.location.href;
@@ -431,7 +432,7 @@ MinorUpdateProvider.prototype = {
           features = 'chrome,centerscreen,dependent,dialog=no';
           break;
       }
-      Services.ww.openWindow(opener, 'chrome://browser/content/aboutDialog.xul', '', features, null);
+      Services.ww.openWindow(opener, url, '', features, null);
     }
     else {
       let US = Cc['@mozilla.org/updates/update-service;1']
