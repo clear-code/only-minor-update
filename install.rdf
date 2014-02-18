@@ -5,7 +5,7 @@
   <RDF:Description RDF:about="urn:mozilla:install-manifest"
                    em:id="only-minor-update@clear-code.com"
                    em:name="Only Minor Update"
-                   em:version="1.0"
+                   em:version="1.1"
                    em:description="Applies only minor updates of the application."
                    em:creator="ClearCode Inc."
                    em:homepageURL="http://www.clear-code.com/">
